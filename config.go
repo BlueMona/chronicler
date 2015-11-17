@@ -11,6 +11,7 @@ type TimelineConfig struct {
 	IndexBucket        string   `json:"index-bucket"`
 	DaysToKeep         int      `json:"days-to-keep"`
 	EnableDebugLogging bool     `json:"enable-debug"`
+	RestPort           int      `json:rest-port`
 }
 
 var defaultConfig = TimelineConfig{
@@ -19,6 +20,7 @@ var defaultConfig = TimelineConfig{
 	IndexBucket:        "log-indexes",
 	DaysToKeep:         30,
 	EnableDebugLogging: true,
+	RestPort:           8080,
 }
 
 func ReadConfig(path string) (TimelineConfig, error) {
