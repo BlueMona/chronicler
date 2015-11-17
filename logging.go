@@ -51,8 +51,3 @@ func logError(source, format string, v ...interface{}) {
 func logErr(source string, err error) {
 	errLogger.Println("[ERROR]", source, err)
 }
-
-// logErrorln writes a string error message using Println
-func logErrorln(source string, err string) {
-	errLogger.Println("[ERROR]", source, err)
-}

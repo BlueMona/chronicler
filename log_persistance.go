@@ -4,7 +4,7 @@ import (
 	riak "github.com/basho/riak-go-client"
 )
 
-func storeLog(logRecord string) (string, error) {
+func storeLog(logId string, logRecord string) error {
 	value := &riak.Object{
 		ContentType:     "text/plain",
 		Charset:         "utf-8",
@@ -13,15 +13,11 @@ func storeLog(logRecord string) (string, error) {
 	}
 
 	cmd, _ := riak.NewStoreValueCommandBuilder().
+		WithKey(logId).
 		WithBucket(Config.LogBucket).
 		WithContent(value).
 		Build()
-	if err := RiakCluster.Execute(cmd); err != nil {
-		logErr("Saving log record ", err)
-		return "", err
-	}
-	svc := cmd.(*riak.StoreValueCommand)
-	return svc.Response.GeneratedKey, nil
+	return RiakCluster.Execute(cmd)
 }
 
 func fetchLog(logId string) (string, error) {
@@ -46,9 +42,5 @@ func deleteLog(logId string) error {
 		WithBucket(Config.LogBucket).
 		WithKey(logId).
 		Build()
-	if err := RiakCluster.Execute(cmd); err != nil {
-		logErr("Deleting log record for "+logId, err)
-		return err
-	}
-	return nil
+	return RiakCluster.Execute(cmd)
 }
