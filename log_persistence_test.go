@@ -21,4 +21,10 @@ func TestSaveAndFetchLogRecord(t *testing.T) {
 	if storedMsg != msg {
 		t.Errorf("expected length of timeline \"%s\", got \"%s\"", msg, storedMsg)
 	}
+
+	deleteLog(riakId)
+
+	if storedMsg, _ := fetchLog(riakId); storedMsg != "" {
+		t.Errorf("Error deleting log. Value for key \"%s\" is \"%s\"", riakId, storedMsg)
+	}
 }
