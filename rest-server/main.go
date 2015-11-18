@@ -12,15 +12,26 @@ var (
 	configPath string
 )
 
+type StoreLogRequest struct {
+	Id    string `form:"id" json:"id"  binding:"required"`
+	Level string `form:"level" json:"level"  binding:"required"`
+	Type  string `form:"type" json:"type"  binding:"required"`
+	Log   string `form:"log" json:"log"  binding:"required"`
+}
+
 func init() {
 	flag.StringVar(&configPath, "c", "", "path to config json")
 }
 
+//TODO - Errors granularity.
+//TODO - separate routing and handlers
+//
 func main() {
 	flag.Parse()
 	rtl.Bootstrap(configPath)
 	router := gin.Default()
-	router.GET("/v1/log/:name", func(c *gin.Context) {
+
+	router.GET("/v1/log/get/:name", func(c *gin.Context) {
 		name := c.Param("name")
 		var msg struct {
 			Error   error             `json:"error"`
@@ -36,6 +47,24 @@ func main() {
 		c.JSON(status, msg)
 	})
 
+	router.POST("/v1/log/append", func(c *gin.Context) {
+		var frm StoreLogRequest
+		// This will infer what binder to use depending on the content-type header.
+		if c.Bind(&frm) == nil {
+			//TODO validate input
+			status := http.StatusOK
+			err := rtl.SaveLog(frm.Id, frm.Level, frm.Type, frm.Log)
+			if err != nil {
+				status = http.StatusBadRequest
+			}
+			var msg struct {
+				Error error `json:"error"`
+			}
+			msg.Error = err
+			c.JSON(status, msg)
+		}
+	})
+
 	address := fmt.Sprintf(":%d", rtl.Config.RestPort)
-	router.Run(address) // listen and serve on 0.0.0.0:8080
+	router.Run(address)
 }
