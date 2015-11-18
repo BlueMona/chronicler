@@ -10,11 +10,12 @@ import (
 )
 
 func Bootstrap(configPath string) {
+	logInfo("[Bootstrap]", "Loading config from path \"%s\"", configPath)
 	//reading configuration
-	if config, err := ReadConfig(configPath); err != nil {
+	if config, err := ReadConfig(configPath); err == nil {
 		Config = config
 	} else {
-		logError("Error reading config %s, using default", configPath)
+		logError("[Bootstrap]", "Error reading config \"%s\", using default", configPath)
 		Config = defaultConfig
 	}
 	//connect to Riak

@@ -32,6 +32,10 @@ func logDebugln(source, err string) {
 	}
 }
 
+func logInfo(source, format string, v ...interface{}) {
+	logger.Printf(fmt.Sprintf("[INFO] %s %s", source, format), v...)
+}
+
 // logWarn writes formatted string warning messages using Printf
 func logWarn(source, format string, v ...interface{}) {
 	logger.Printf(fmt.Sprintf("[WARNING] %s %s", source, format), v...)
