@@ -52,22 +52,22 @@ Default values if config file is omitted are
 
 ###Store new log record
 
-***Request***
-Method: POST
-URL: /v1/log/append
-Form fields:
- `id` - [string] logs collection identifier (for example user ID) , 
- `level` - [string] severity of the log,
- `type` - [string] context data of log record, 
- `log` - [string] body of the log record
+**Request**
+- Method: POST
+- URL: /v1/log/append
+-Form fields:
+	-`id` - [string] logs collection identifier (for example user ID) , 
+ 	-`level` - [string] severity of the log,
+ 	-`type` - [string] context data of log record, 
+ 	-`log` - [string] body of the log record
 
 ```
 curl --data "id=zipp&level=ERROR&type=LOGIN&log=Login+error+some+beautiful+thursday+morning" http://localhost:8080/v1/log/append
 
 ```
 
-***Response***
-Status 200 if record is saved successfully, status 400 if error is occured and `error` field in resul object contains description of error
+**Response**
+Status **200** if record is saved successfully, status **400** if error is occured and `error` field in resul object contains description of error
 ```
 {
 	"error": null 
@@ -77,10 +77,11 @@ Status 200 if record is saved successfully, status 400 if error is occured and `
 ###Fetch logs collection
 Log collection for particular identifier are sorted on chronological order and keeping records not older than `days-to-keep` days.
 
-***Request***
-Method: POST
-URL: /v1/log/get/{id}
-***Response***
+**Request**
+- **Method**: POST
+- **URL**: /v1/log/get/{id}
+**Response**
+```
 {
 	"error": null
 	"payload": [
@@ -94,11 +95,44 @@ URL: /v1/log/get/{id}
 		},
 	]
 }
-
+```
+Example
 
 ```
-curl http://localhost:8080/v1/log/get/zipp
+$ curl http://localhost:8080/v1/log/get/zipp
 
 $ curl http://localhost:8080/v1/log/get/zipp
-{"error":null,"payload":[{"key":"513946069915754496","time":"2015-11-18T07:18:11.724264733+02:00","level":"ERROR","type":"LOGIN","caption":"Login error some beautiful thursday morning 2"},{"key":"513946109254131712","time":"2015-11-18T07:18:21.103801314+02:00","level":"ERROR","type":"LOGIN","caption":"Login error some beautiful thursday morning 3"},{"key":"513946339051659264","time":"2015-11-18T07:19:15.891890789+02:00","level":"ERROR","type":"LOGIN","caption":"Login error some beautiful thursday morning 4"},{"key":"513946456286650368","time":"2015-11-18T07:19:43.842014144+02:00","level":"ERROR","type":"LOGIN","caption":"Login error some beautiful thursday morning 5"}]}
+{
+  "error": null,
+  "payload": [
+    {
+      "key": "513946069915754496",
+      "time": "2015-11-18T07:18:11.724264733+02:00",
+      "level": "ERROR",
+      "type": "LOGIN",
+      "caption": "Login error some beautiful thursday morning 2"
+    },
+    {
+      "key": "513946109254131712",
+      "time": "2015-11-18T07:18:21.103801314+02:00",
+      "level": "ERROR",
+      "type": "LOGIN",
+      "caption": "Login error some beautiful thursday morning 3"
+    },
+    {
+      "key": "513946339051659264",
+      "time": "2015-11-18T07:19:15.891890789+02:00",
+      "level": "ERROR",
+      "type": "LOGIN",
+      "caption": "Login error some beautiful thursday morning 4"
+    },
+    {
+      "key": "513946456286650368",
+      "time": "2015-11-18T07:19:43.842014144+02:00",
+      "level": "ERROR",
+      "type": "LOGIN",
+      "caption": "Login error some beautiful thursday morning 5"
+    }
+  ]
+}
 ```
