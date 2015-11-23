@@ -1,4 +1,4 @@
-package riaktimeline
+package timeline
 
 import (
 	riak "github.com/basho/riak-go-client"
@@ -6,4 +6,3 @@ import (
 )
 
 var snowFlake *gosnow.SnowFlake
-var Config TimelineConfig = defaultConfig

@@ -4,12 +4,12 @@ import (
 	riak "github.com/basho/riak-go-client"
 )
 
-type LogRecordDao struct {
+type LogRecordRiakDao struct {
 	Cluster   riak.Cluster
 	LogBucket string
 }
 
-func (dao *LogRecordDao) SaveLogRecord(logId string, logRecord string) error {
+func (dao *LogRecordRiakDao) SaveLogRecord(logId string, logRecord string) error {
 	value := &riak.Object{
 		ContentType:     "text/plain",
 		Charset:         "utf-8",
@@ -25,7 +25,7 @@ func (dao *LogRecordDao) SaveLogRecord(logId string, logRecord string) error {
 	return dao.Cluster.Execute(cmd)
 }
 
-func (dao *LogRecordDao) GetLogRecord(logId string) (string, error) {
+func (dao *LogRecordRiakDao) GetLogRecord(logId string) (string, error) {
 	cmd, _ := riak.NewFetchValueCommandBuilder().
 		WithBucket(dao.LogBucket).
 		WithNotFoundOk(true).
@@ -42,10 +42,17 @@ func (dao *LogRecordDao) GetLogRecord(logId string) (string, error) {
 	return string(fvc.Response.Values[0].Value), nil
 }
 
-func (dao *LogRecordDao) DeleteLogRecord(logId string) error {
+func (dao *LogRecordRiakDao) DeleteLogRecord(logId string) error {
 	cmd, _ := riak.NewDeleteValueCommandBuilder().
 		WithBucket(dao.LogBucket).
 		WithKey(logId).
 		Build()
 	return dao.Cluster.Execute(cmd)
+}
+
+func NewLogRecordDao(cluster riak.Cluster, logBucket string) LogRecordRiakDao {
+	return LogRecordRiakDao{
+		Cluster:   cluster,
+		LogBucket: logBucket,
+	}
 }

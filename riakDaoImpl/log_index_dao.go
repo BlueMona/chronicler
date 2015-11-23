@@ -70,3 +70,11 @@ func (dao *LogIndexRiakDAO) getTimeline(userId string) (ent.TimelineIndex, error
 	index = ent.SortEntries(index)
 	return index, nil
 }
+
+func NewLogIndexRiakDAO(cluster riak.Cluster, indexBucket string) LogIndexRiakDAO {
+	return LogIndexRiakDAO{
+		Cluster:     cluster,
+		Resolver:    &TimelineConfilctResolver{},
+		IndexBucket: indexBucket,
+	}
+}

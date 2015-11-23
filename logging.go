@@ -1,4 +1,4 @@
-package riaktimeline
+package timeline
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package riaktimeline
+package timeline
 
 import (
 	entity "github.com/PeerioTechnologies/riak-timeline-service/entity"
