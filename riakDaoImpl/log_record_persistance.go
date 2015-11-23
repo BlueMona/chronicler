@@ -1,4 +1,4 @@
-package riaktimeline
+package riakdaoimpl
 
 import (
 	riak "github.com/basho/riak-go-client"

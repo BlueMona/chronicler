@@ -1,11 +1,9 @@
-package riaktimeline
+package riakdaoimpl
 
 import (
 	"encoding/json"
 	riak "github.com/basho/riak-go-client"
 )
-
-//TODO extract storage interface for possible other storage backend
 
 type TimelineConfilctResolver struct {
 }

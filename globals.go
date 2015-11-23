@@ -7,4 +7,3 @@ import (
 
 var snowFlake *gosnow.SnowFlake
 var Config TimelineConfig = defaultConfig
-var RiakCluster *riak.Cluster

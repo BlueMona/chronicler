@@ -1,4 +1,4 @@
-package riaktimeline
+package riakdaoimpl
 
 import (
 	"fmt"
