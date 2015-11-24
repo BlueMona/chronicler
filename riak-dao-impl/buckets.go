@@ -4,7 +4,7 @@ import (
 	riak "github.com/basho/riak-go-client"
 )
 
-func initIndexBucket(cluster *riak.Cluster, bucket string) {
+func InitIndexBucket(cluster *riak.Cluster, bucket string) {
 	cmd, err := riak.NewStoreBucketPropsCommandBuilder().
 		WithBucket(bucket).
 		WithAllowMult(true).

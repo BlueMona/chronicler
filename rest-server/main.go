@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	rtl "github.com/PeerioTechnologies/riak-timeline-service"
+	entity "github.com/PeerioTechnologies/riak-timeline-service/entity"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -28,16 +28,16 @@ func init() {
 //
 func main() {
 	flag.Parse()
-	rtl.Bootstrap(configPath)
+	bootstrap(configPath)
 	router := gin.Default()
 
 	router.GET("/v1/log/get/:name", func(c *gin.Context) {
 		name := c.Param("name")
 		var msg struct {
-			Error   error             `json:"error"`
-			Payload rtl.TimelineIndex `json:"payload"`
+			Error   error                `json:"error"`
+			Payload entity.TimelineIndex `json:"payload"`
 		}
-		result, err := rtl.FetchMergedTimeline(name)
+		result, err := dao.GetTimeline(name)
 		status := http.StatusOK
 		if err != nil {
 			status = http.StatusInternalServerError
@@ -52,19 +52,18 @@ func main() {
 		// This will infer what binder to use depending on the content-type header.
 		if c.Bind(&frm) == nil {
 			//TODO validate input
-			status := http.StatusOK
-			err := rtl.SaveLog(frm.Id, frm.Level, frm.Type, frm.Log)
-			if err != nil {
-				status = http.StatusBadRequest
-			}
 			var msg struct {
 				Error error `json:"error"`
 			}
-			msg.Error = err
+			status := http.StatusOK
+			if err := dao.SaveLog(frm.Id, frm.Level, frm.Type, frm.Log); err != nil {
+				status = http.StatusBadRequest
+				msg.Error = err
+			}
 			c.JSON(status, msg)
 		}
 	})
 
-	address := fmt.Sprintf(":%d", rtl.Config.RestPort)
+	address := fmt.Sprintf(":%d", config.RestPort)
 	router.Run(address)
 }

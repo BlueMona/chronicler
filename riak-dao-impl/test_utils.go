@@ -21,7 +21,7 @@ func initTestCluster() {
 		if err := cluster.Start(); err != nil {
 			panic(fmt.Sprintf("Error %v", err))
 		}
-		initIndexBucket(cluster, logIndexBucket)
+		InitIndexBucket(cluster, logIndexBucket)
 		TestCluster = cluster
 	}
 }

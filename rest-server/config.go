@@ -2,13 +2,17 @@ package main
 
 import (
 	"encoding/json"
-	riakDAO "github.com/PeerioTechnologies/riak-timeline-service/riakDaoImpl"
+	"fmt"
 	"io/ioutil"
 )
 
 type ServiceConfig struct {
-	*riakDAO.TimelineDAOConfig
-	RestPort int `json:rest-port`
+	Nodes              []string `json:"nodes"`
+	LogBucket          string   `json:"log-bucket"`
+	IndexBucket        string   `json:"index-bucket"`
+	DaysToKeep         int      `json:"days-to-keep"`
+	EnableDebugLogging bool     `json:"enable-debug"`
+	RestPort           int      `json:"rest-port"`
 }
 
 var defaultConfig = ServiceConfig{
@@ -23,10 +27,13 @@ var defaultConfig = ServiceConfig{
 func ReadConfig(path string) (ServiceConfig, error) {
 	var config ServiceConfig
 	if file, err := ioutil.ReadFile(path); err != nil {
+		fmt.Printf("Error reading config file %q, %v\n", path, err)
 		return config, err
-	}
-	if err = json.Unmarshal(file, &config); err != nil {
-		return config, err
+	} else {
+		if err := json.Unmarshal(file, &config); err != nil {
+			fmt.Printf("Error parsing config file %v", err)
+			return config, err
+		}
 	}
 	return config, nil
 }

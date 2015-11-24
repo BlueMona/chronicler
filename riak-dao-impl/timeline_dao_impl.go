@@ -17,13 +17,13 @@ type TimelineRiakDaoImpl struct {
 	SnowFlake    *gosnow.SnowFlake
 }
 
-func (dao *TimelineRiakDaoImpl) GetTimeline(id string, daysToKeep int) (ent.TimelineIndex, error) {
+func (dao *TimelineRiakDaoImpl) GetTimeline(id string) (ent.TimelineIndex, error) {
 	index, err := dao.IndexDao.GetTimeline(id)
 	if err != nil {
 		return nil, err
 	}
 	//TODO add removal of old entries by channel
-	index, _ = ent.SplitByDaysAge(index, daysToKeep)
+	// index, _ = ent.SplitByDaysAge(index, daysToKeep)
 	//async fill IndexEntry.Caption with real log data
 	itemsQty := len(index)
 	group := new(sync.WaitGroup)
@@ -65,9 +65,9 @@ func (dao *TimelineRiakDaoImpl) SaveLog(userId string, level string, typeStr str
 	return err
 }
 
-func NewTimelineRiakDaoImpl(cluster *riak.Cluster, indexBucket string, logBucket string) TimelineRiakDaoImpl {
+func NewTimelineRiakDaoImpl(cluster *riak.Cluster, indexBucket string, logBucket string) *TimelineRiakDaoImpl {
 	snowFlake, _ := gosnow.Default()
-	return TimelineRiakDaoImpl{
+	return &TimelineRiakDaoImpl{
 		Cluster:      cluster,
 		IndexDao:     NewLogIndexRiakDAO(cluster, indexBucket),
 		LogRecordDao: NewLogRecordRiakDao(cluster, logBucket),
