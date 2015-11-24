@@ -5,7 +5,7 @@ import (
 )
 
 type LogRecordRiakDao struct {
-	Cluster   riak.Cluster
+	Cluster   *riak.Cluster
 	LogBucket string
 }
 
@@ -50,8 +50,8 @@ func (dao *LogRecordRiakDao) DeleteLogRecord(logId string) error {
 	return dao.Cluster.Execute(cmd)
 }
 
-func NewLogRecordDao(cluster riak.Cluster, logBucket string) LogRecordRiakDao {
-	return LogRecordRiakDao{
+func NewLogRecordRiakDao(cluster *riak.Cluster, logBucket string) *LogRecordRiakDao {
+	return &LogRecordRiakDao{
 		Cluster:   cluster,
 		LogBucket: logBucket,
 	}

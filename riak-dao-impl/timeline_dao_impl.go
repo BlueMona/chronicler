@@ -1,7 +1,6 @@
 package riakdaoimpl
 
 import (
-	"fmt"
 	ent "github.com/PeerioTechnologies/riak-timeline-service/entity"
 	riak "github.com/basho/riak-go-client"
 	gosnow "github.com/sdming/gosnow"
@@ -12,13 +11,15 @@ import (
 
 //Implements TimelineDAO
 type TimelineRiakDaoImpl struct {
-	Cluster      riak.Cluster
-	IndexDao     LogIndexRiakDAO
-	LogRecordDao LogRecordRiakDao
+	Cluster      *riak.Cluster
+	IndexDao     *LogIndexRiakDAO
+	LogRecordDao *LogRecordRiakDao
+	SnowFlake    *gosnow.SnowFlake
 }
 
 func (dao *TimelineRiakDaoImpl) GetTimeline(id string, daysToKeep int) (ent.TimelineIndex, error) {
-	if index, err := dao.IndexDao.getTimeline(id); err != nil {
+	index, err := dao.IndexDao.GetTimeline(id)
+	if err != nil {
 		return nil, err
 	}
 	//TODO add removal of old entries by channel
@@ -39,9 +40,9 @@ func (dao *TimelineRiakDaoImpl) GetTimeline(id string, daysToKeep int) (ent.Time
 }
 
 func (dao *TimelineRiakDaoImpl) SaveLog(userId string, level string, typeStr string, msg string) error {
-	d, _ := snowFlake.Next()
+	id, _ := dao.SnowFlake.Next()
 	idStr := strconv.FormatUint(id, 10)
-	entry := IndexEntry{
+	entry := ent.IndexEntry{
 		Key:     idStr,
 		Time:    time.Now(),
 		Level:   level,
@@ -64,10 +65,12 @@ func (dao *TimelineRiakDaoImpl) SaveLog(userId string, level string, typeStr str
 	return err
 }
 
-func NewTimelineRiakDaoImpl(cluster riak.Cluster, indexBucket string, logBucket string) TimelineRiakDaoImpl {
+func NewTimelineRiakDaoImpl(cluster *riak.Cluster, indexBucket string, logBucket string) TimelineRiakDaoImpl {
+	snowFlake, _ := gosnow.Default()
 	return TimelineRiakDaoImpl{
 		Cluster:      cluster,
 		IndexDao:     NewLogIndexRiakDAO(cluster, indexBucket),
-		LogRecordDao: NewLogRecordDao(cluster, logBucket),
+		LogRecordDao: NewLogRecordRiakDao(cluster, logBucket),
+		SnowFlake:    snowFlake,
 	}
 }

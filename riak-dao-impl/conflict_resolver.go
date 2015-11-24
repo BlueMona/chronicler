@@ -10,9 +10,9 @@ type TimelineConfilctResolver struct {
 }
 
 func (cr *TimelineConfilctResolver) Resolve(objs []*riak.Object) []*riak.Object {
-	indexes := []TimelineIndex{}
+	indexes := []ent.TimelineIndex{}
 	for _, obj := range objs {
-		var index TimelineIndex
+		var index ent.TimelineIndex
 		if err := json.Unmarshal(obj.Value, &index); err == nil {
 			indexes = append(indexes, index)
 		}

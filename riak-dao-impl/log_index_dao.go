@@ -7,7 +7,7 @@ import (
 )
 
 type LogIndexRiakDAO struct {
-	Cluster     riak.Cluster
+	Cluster     *riak.Cluster
 	Resolver    *TimelineConfilctResolver
 	IndexBucket string
 }
@@ -29,26 +29,27 @@ func (dao *LogIndexRiakDAO) fetch(userId string) *riak.FetchValueResponse {
 	return fvc.Response
 }
 
-func (dao *LogIndexRiakDAO) AppendToTimeline(userId string, entry IndexEntry) error {
+func (dao *LogIndexRiakDAO) AppendToTimeline(userId string, entry ent.IndexEntry) error {
 	value := riak.Object{}
 	value.ContentType = "application/json"
 	value.Charset = "utf-8"
 	value.ContentEncoding = "utf-8"
-	index := TimelineIndex{entry}
+	index := ent.TimelineIndex{entry}
 	if responce := dao.fetch(userId); responce != nil && !responce.IsNotFound {
 		value.VClock = responce.VClock
 		if err := json.Unmarshal(responce.Values[0].Value, &index); err != nil {
 			return err
 		}
 	}
-	index = ent.sortEntries(append(index, entry))
+	index = ent.SortEntries(append(index, entry))
 	encoded, _ := json.Marshal(index)
 	value.Value = encoded
-	if cmd, err := riak.NewStoreValueCommandBuilder().
+	cmd, err := riak.NewStoreValueCommandBuilder().
 		WithBucket(dao.IndexBucket).
 		WithKey(userId).
 		WithContent(&value).
-		Build(); err != nil {
+		Build()
+	if err != nil {
 		logErr("Saving timeline for "+userId, err)
 		return err
 	}
@@ -59,9 +60,10 @@ func (dao *LogIndexRiakDAO) AppendToTimeline(userId string, entry IndexEntry) er
 	return nil
 }
 
-func (dao *LogIndexRiakDAO) getTimeline(userId string) (ent.TimelineIndex, error) {
+func (dao *LogIndexRiakDAO) GetTimeline(userId string) (ent.TimelineIndex, error) {
 	index := ent.TimelineIndex{}
-	if responce := dao.fetch(userId); responce == nil || responce.IsNotFound {
+	responce := dao.fetch(userId)
+	if responce == nil || responce.IsNotFound {
 		return index, nil
 	}
 	if err := json.Unmarshal(responce.Values[0].Value, &index); err != nil {
@@ -71,8 +73,8 @@ func (dao *LogIndexRiakDAO) getTimeline(userId string) (ent.TimelineIndex, error
 	return index, nil
 }
 
-func NewLogIndexRiakDAO(cluster riak.Cluster, indexBucket string) LogIndexRiakDAO {
-	return LogIndexRiakDAO{
+func NewLogIndexRiakDAO(cluster *riak.Cluster, indexBucket string) *LogIndexRiakDAO {
+	return &LogIndexRiakDAO{
 		Cluster:     cluster,
 		Resolver:    &TimelineConfilctResolver{},
 		IndexBucket: indexBucket,

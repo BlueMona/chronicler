@@ -12,7 +12,7 @@ func buildNodeOptions(addresses []string) []*riak.NodeOptions {
 	return options
 }
 
-func initCluster(options []*riak.NodeOptions) (*riak.Cluster, err) {
+func initCluster(options []*riak.NodeOptions) (*riak.Cluster, error) {
 	nodes := make([]*riak.Node, 0, len(options))
 	for _, nodeOpts := range options {
 		if node, err := riak.NewNode(nodeOpts); err == nil {

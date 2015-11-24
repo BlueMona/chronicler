@@ -5,16 +5,17 @@ import (
 )
 
 func TestSaveAndFetchLogRecord(t *testing.T) {
-	Config = defaultConfig
 	initTestCluster()
+	dao := NewLogRecordRiakDao(TestCluster, logRecordsBucket)
+
 	msg := "log message"
 	id := "1111111111"
-	err1 := storeLog(id, msg)
+	err1 := dao.SaveLogRecord(id, msg)
 	if err1 != nil {
 		t.Errorf("Error saving log", err1)
 	}
 
-	storedMsg, err2 := fetchLog(id)
+	storedMsg, err2 := dao.GetLogRecord(id)
 	if err2 != nil {
 		t.Errorf("Error fetching log", err2)
 	}
@@ -23,9 +24,9 @@ func TestSaveAndFetchLogRecord(t *testing.T) {
 		t.Errorf("expected length of timeline \"%s\", got \"%s\"", msg, storedMsg)
 	}
 
-	deleteLog(id)
+	dao.DeleteLogRecord(id)
 
-	if storedMsg, _ := fetchLog(id); storedMsg != "" {
+	if storedMsg, _ := dao.GetLogRecord(id); storedMsg != "" {
 		t.Errorf("Error deleting log. Value for key \"%s\" is \"%s\"", id, storedMsg)
 	}
 }
