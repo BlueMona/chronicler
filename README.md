@@ -9,8 +9,8 @@
 - `go get github.com/basho/riak-go-client`
 - `go get github.com/sdming/gosnow`
 - `go get ggithub.com/gin-gonic/gin`
-- `go get github.com/PeerioTechnologies/riak-timeline-service`
-- `go install github.com/PeerioTechnologies/riak-timeline-service/rest-server`
+- `go get github.com/PeerioTechnologies/chronicler`
+- `go install github.com/PeerioTechnologies/chronicler/chronicler-rest-server`
 
 ## Run service
 

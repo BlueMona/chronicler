@@ -2,7 +2,7 @@ package riakdaoimpl
 
 import (
 	"fmt"
-	ent "github.com/PeerioTechnologies/riak-timeline-service/entity"
+	ent "github.com/PeerioTechnologies/chronicler/entity"
 	"testing"
 	"time"
 )

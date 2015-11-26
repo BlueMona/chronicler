@@ -3,9 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	entity "github.com/PeerioTechnologies/riak-timeline-service/entity"
+	entity "github.com/PeerioTechnologies/chronicler/entity"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
+	"os/signal"
 )
 
 var (
@@ -66,4 +68,17 @@ func main() {
 
 	address := fmt.Sprintf(":%d", config.RestPort)
 	router.Run(address)
+
+	//Handling iterrupt
+	signalChan := make(chan os.Signal, 1)
+	cleanupDone := make(chan bool)
+	signal.Notify(signalChan, os.Interrupt)
+	go func() {
+		for _ = range signalChan {
+			fmt.Println("\nReceived an interrupt, stopping services...\n")
+			// cleanup(services, c)
+			cleanupDone <- true
+		}
+	}()
+	<-cleanupDone
 }

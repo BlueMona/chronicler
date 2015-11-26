@@ -1,7 +1,7 @@
-package timeline
+package chronicler
 
 import (
-	entity "github.com/PeerioTechnologies/riak-timeline-service/entity"
+	entity "github.com/PeerioTechnologies/chronicler/entity"
 )
 
 type TimelineDAO interface {

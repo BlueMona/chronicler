@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	timeline "github.com/PeerioTechnologies/riak-timeline-service"
-	riakDAO "github.com/PeerioTechnologies/riak-timeline-service/riak-dao-impl"
+	timeline "github.com/PeerioTechnologies/chronicler"
+	riakDAO "github.com/PeerioTechnologies/chronicler/riak-dao-impl"
 )
 
 var config ServiceConfig

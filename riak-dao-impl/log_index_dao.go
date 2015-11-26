@@ -2,7 +2,7 @@ package riakdaoimpl
 
 import (
 	"encoding/json"
-	ent "github.com/PeerioTechnologies/riak-timeline-service/entity"
+	ent "github.com/PeerioTechnologies/chronicler/entity"
 	riak "github.com/basho/riak-go-client"
 )
 
