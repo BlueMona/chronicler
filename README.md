@@ -13,6 +13,7 @@
 - `go install github.com/PeerioTechnologies/chronicler/chronicler-rest-server`
 
 ## Run service
+Service binary will appear as the `$GOPATH/bin/chronicler-rest-server`
 
 Service accepts configuration file in json format such as
 ```
