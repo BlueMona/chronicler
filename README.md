@@ -43,11 +43,11 @@ Default values if config file is omitted are
 
 ## Run service with default settings
 
-- `$GOPATH/bin/rest-server`
+- `$GOPATH/bin/chronicler-rest-server`
 
 ## Run service with custom settings
 
-- `$GOPATH/bin/rest-server -c config.json`
+- `$GOPATH/bin/chronicler-rest-server -c config.json`
 
 ## REST interface
 
