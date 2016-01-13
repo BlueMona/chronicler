@@ -1,4 +1,6 @@
-# Rest service for storing and querying user logs (whatever logs for particular logs id)
+# Chronicler
+
+A lightweight distributed micro-service that offers a fast and flexible solution for logging user actions in high-load environments with realtime data querying.
 
 ##Install and run
 
