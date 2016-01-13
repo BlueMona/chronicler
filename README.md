@@ -15,31 +15,25 @@
 ## Run service
 Service binary will appear as the `$GOPATH/bin/chronicler-rest-server`
 
-Service accepts configuration file in json format such as
+Service accepts configuration file in json format such as following example with default config values:
 ```
 {
-	"nodes": ["host1:8881", "host1:8882", "host3:8883"],
-	"log-bucket": "log-entries",
-	"index-bucket": "log-indexes",
-	"days-to-keep": 30,
-	"cenable-debug": true,
-	"rest-port": 8080
+  "days-to-keep": 30,
+  "enable-debug": true,
+  "rest-port": 8080,
+  "storage": {
+    "nodes": ["127.0.0.1:11087"],
+    "node-template": {
+      "min-connections": 10,
+      "max-connections": 30
+    },
+    "log-bucket": "log-entries",
+    "index-bucket": "log-indexes"
+  }
 }
 ```
+
 In the `nodes` array riak node ports must point to protobuf riak node endpoint.
-
-Default values if config file is omitted are
-```
-{
-	"nodes": ["127.0.0.1:11087"],
-	"log-bucket": "log-entries",
-	"index-bucket": "log-indexes",
-	"days-to-keep": 30,
-	"cenable-debug": true,
-	"rest-port": 8080
-}
-```
-
 
 ## Run service with default settings
 

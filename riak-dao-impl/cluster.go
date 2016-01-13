@@ -4,9 +4,9 @@ import (
 	riak "github.com/basho/riak-go-client"
 )
 
-func StartCluster(addresses []string, logIndexBucket string, enableDebug bool) (*riak.Cluster, error) {
+func StartCluster(addresses []string, minConnections uint16, maxConnections uint16, logIndexBucket string, enableDebug bool) (*riak.Cluster, error) {
 	riak.EnableDebugLogging = enableDebug
-	options := buildNodeOptions(addresses)
+	options := buildNodeOptions(addresses, minConnections, maxConnections)
 	cluster, err := initCluster(options)
 	if err != nil {
 		return cluster, err
@@ -18,10 +18,10 @@ func StartCluster(addresses []string, logIndexBucket string, enableDebug bool) (
 	return cluster, nil
 }
 
-func buildNodeOptions(addresses []string) []*riak.NodeOptions {
+func buildNodeOptions(addresses []string, minConnections uint16, maxConnections uint16) []*riak.NodeOptions {
 	options := make([]*riak.NodeOptions, 0, len(addresses))
 	for _, address := range addresses {
-		options = append(options, &riak.NodeOptions{RemoteAddress: address})
+		options = append(options, &riak.NodeOptions{RemoteAddress: address, MinConnections: minConnections, MaxConnections: maxConnections})
 	}
 	return options
 }

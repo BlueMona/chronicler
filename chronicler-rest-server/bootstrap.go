@@ -15,8 +15,13 @@ func bootstrap(path string) {
 	} else {
 		config = cnf
 	}
-	if cluster, err := riakDAO.StartCluster(config.Nodes, config.IndexBucket, config.EnableDebugLogging); err == nil {
-		dao = riakDAO.NewTimelineRiakDaoImpl(cluster, config.IndexBucket, config.LogBucket)
+	if cluster, err := riakDAO.StartCluster(
+		config.StorageConfig.Nodes,
+		config.StorageConfig.NodeTemplate.MinConnections,
+		config.StorageConfig.NodeTemplate.MaxConnections,
+		config.StorageConfig.IndexBucket,
+		config.EnableDebugLogging); err == nil {
+		dao = riakDAO.NewTimelineRiakDaoImpl(cluster, config.StorageConfig.IndexBucket, config.StorageConfig.LogBucket)
 	} else {
 		panic(fmt.Sprintf("Error initialising Riak DAO %s", err.Error()))
 	}

@@ -13,7 +13,7 @@ var TestCluster *riak.Cluster
 func initTestCluster() {
 	if TestCluster == nil {
 		riak.EnableDebugLogging = true
-		nodeOptions := buildNodeOptions(testRiakNodes)
+		nodeOptions := buildNodeOptions(testRiakNodes, 10, 30)
 		cluster, err := initCluster(nodeOptions)
 		if err != nil {
 			panic(fmt.Sprintf("Error %v", err))
