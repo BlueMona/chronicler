@@ -10,7 +10,7 @@ A lightweight distributed micro-service that offers a fast and flexible solution
 - `export GOPATH=./go_src`
 - `go get github.com/basho/riak-go-client`
 - `go get github.com/sdming/gosnow`
-- `go get ggithub.com/gin-gonic/gin`
+- `go get github.com/gin-gonic/gin`
 - `go get github.com/PeerioTechnologies/chronicler`
 - `go install github.com/PeerioTechnologies/chronicler/chronicler-rest-server`
 
