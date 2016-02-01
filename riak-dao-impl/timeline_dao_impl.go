@@ -15,15 +15,19 @@ type TimelineRiakDaoImpl struct {
 	IndexDao     *LogIndexRiakDAO
 	LogRecordDao *LogRecordRiakDao
 	SnowFlake    *gosnow.SnowFlake
+	DaysToKeep   int
 }
 
 func (dao *TimelineRiakDaoImpl) GetTimeline(id string) (ent.TimelineIndex, error) {
-	index, err := dao.IndexDao.GetTimeline(id)
+	index, err := dao.IndexDao.GetLofIndex(id)
 	if err != nil {
 		return nil, err
 	}
-	//TODO add removal of old entries by channel
-	// index, _ = ent.SplitByDaysAge(index, daysToKeep)
+
+	//add removal of old entries by channel
+	index, oldEntries := ent.SplitByDaysAge(index, dao.DaysToKeep)
+	go dao.removeOldEntries(oldEntries, make(chan bool))
+
 	//async fill IndexEntry.Caption with real log data
 	itemsQty := len(index)
 	group := new(sync.WaitGroup)
@@ -37,6 +41,20 @@ func (dao *TimelineRiakDaoImpl) GetTimeline(id string) (ent.TimelineIndex, error
 	}
 	group.Wait()
 	return index, nil
+}
+
+func (dao *TimelineRiakDaoImpl) removeOldEntries(entries ent.TimelineIndex, ch chan bool) {
+	itemsQty := len(entries)
+	group := new(sync.WaitGroup)
+	group.Add(itemsQty)
+	for i := 0; i < itemsQty; i++ {
+		go func(logId string, group *sync.WaitGroup) {
+			dao.LogRecordDao.DeleteLogRecord(logId)
+			group.Done()
+		}(entries[i].Key, group)
+	}
+	group.Wait()
+	ch <- true
 }
 
 func (dao *TimelineRiakDaoImpl) SaveLog(userId string, level string, typeStr string, msg string) error {
@@ -54,7 +72,7 @@ func (dao *TimelineRiakDaoImpl) SaveLog(userId string, level string, typeStr str
 		errc <- dao.LogRecordDao.SaveLogRecord(idStr, msg)
 	}()
 	go func() {
-		errc <- dao.IndexDao.AppendToTimeline(userId, entry)
+		errc <- dao.IndexDao.AppendToLogIndex(userId, entry)
 	}()
 	var err error
 	for i := 0; i < 2; i++ {
@@ -65,12 +83,13 @@ func (dao *TimelineRiakDaoImpl) SaveLog(userId string, level string, typeStr str
 	return err
 }
 
-func NewTimelineRiakDaoImpl(cluster *riak.Cluster, indexBucket string, logBucket string) *TimelineRiakDaoImpl {
+func NewTimelineRiakDaoImpl(cluster *riak.Cluster, indexBucket string, logBucket string, daysToKeep int) *TimelineRiakDaoImpl {
 	snowFlake, _ := gosnow.Default()
 	return &TimelineRiakDaoImpl{
 		Cluster:      cluster,
 		IndexDao:     NewLogIndexRiakDAO(cluster, indexBucket),
 		LogRecordDao: NewLogRecordRiakDao(cluster, logBucket),
 		SnowFlake:    snowFlake,
+		DaysToKeep:   daysToKeep,
 	}
 }

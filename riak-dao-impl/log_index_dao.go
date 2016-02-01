@@ -29,7 +29,24 @@ func (dao *LogIndexRiakDAO) fetch(userId string) *riak.FetchValueResponse {
 	return fvc.Response
 }
 
-func (dao *LogIndexRiakDAO) AppendToTimeline(userId string, entry ent.IndexEntry) error {
+func (dao *LogIndexRiakDAO) store(userId string, value riak.Object) error {
+	cmd, err := riak.NewStoreValueCommandBuilder().
+		WithBucket(dao.IndexBucket).
+		WithKey(userId).
+		WithContent(&value).
+		Build()
+	if err != nil {
+		logErr("Saving timeline index for "+userId, err)
+		return err
+	}
+	if err = dao.Cluster.Execute(cmd); err != nil {
+		logErr("Saving timeline index for "+userId, err)
+		return err
+	}
+	return nil
+}
+
+func (dao *LogIndexRiakDAO) AppendToLogIndex(userId string, entry ent.IndexEntry) error {
 	value := riak.Object{}
 	value.ContentType = "application/json"
 	value.Charset = "utf-8"
@@ -44,23 +61,10 @@ func (dao *LogIndexRiakDAO) AppendToTimeline(userId string, entry ent.IndexEntry
 	index = ent.SortEntries(append(index, entry))
 	encoded, _ := json.Marshal(index)
 	value.Value = encoded
-	cmd, err := riak.NewStoreValueCommandBuilder().
-		WithBucket(dao.IndexBucket).
-		WithKey(userId).
-		WithContent(&value).
-		Build()
-	if err != nil {
-		logErr("Saving timeline for "+userId, err)
-		return err
-	}
-	if err = dao.Cluster.Execute(cmd); err != nil {
-		logErr("Saving timeline for "+userId, err)
-		return err
-	}
-	return nil
+	return dao.store(userId, value)
 }
 
-func (dao *LogIndexRiakDAO) GetTimeline(userId string) (ent.TimelineIndex, error) {
+func (dao *LogIndexRiakDAO) GetLofIndex(userId string) (ent.TimelineIndex, error) {
 	index := ent.TimelineIndex{}
 	responce := dao.fetch(userId)
 	if responce == nil || responce.IsNotFound {

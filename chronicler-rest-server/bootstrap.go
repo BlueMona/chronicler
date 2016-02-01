@@ -21,7 +21,7 @@ func bootstrap(path string) {
 		config.StorageConfig.NodeTemplate.MaxConnections,
 		config.StorageConfig.IndexBucket,
 		config.EnableDebugLogging); err == nil {
-		dao = riakDAO.NewTimelineRiakDaoImpl(cluster, config.StorageConfig.IndexBucket, config.StorageConfig.LogBucket)
+		dao = riakDAO.NewTimelineRiakDaoImpl(cluster, config.StorageConfig.IndexBucket, config.StorageConfig.LogBucket, config.DaysToKeep)
 	} else {
 		panic(fmt.Sprintf("Error initialising Riak DAO %s", err.Error()))
 	}
