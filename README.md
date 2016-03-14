@@ -50,8 +50,8 @@ In the `nodes` array riak node ports must point to protobuf riak node endpoint.
 ###Store new log record
 
 **Request**
-- Method: POST
-- URL: /v1/log/append
+- **Method**: POST
+- **URL**: /v1/log/append
 -Form fields:
 	-`id` - [string] logs collection identifier (for example user ID) , 
  	-`level` - [string] severity of the log,
@@ -77,6 +77,7 @@ Log collection for particular identifier are sorted on chronological order and k
 **Request**
 - **Method**: POST
 - **URL**: /v1/log/get/{id}
+
 **Response**
 ```
 {
@@ -131,5 +132,35 @@ $ curl http://localhost:8080/v1/log/get/zipp
       "caption": "Login error some beautiful thursday morning 5"
     }
   ]
+}
+```
+
+
+###Check service status
+Reports current service status
+
+**Request**
+- **Method**: GET
+- **URL**: /v1/report
+
+**Response**
+
+If everything is fine:
+
+```
+{
+  state: "ok",
+  description: ""
+}
+```
+Example for service in situation where Riak is down
+
+```
+$ curl http://localhost:8080/v1/log/get/zipp
+
+$ curl http://localhost:8080/v1/log/get/zipp
+{
+  state: "fail",
+  description: "Timeline: no ping to Riak instance. LogRecords: no ping to Riak instance."
 }
 ```
