@@ -53,11 +53,10 @@ In the `nodes` array riak node ports must point to protobuf riak node endpoint.
 - **Method**: POST
 - **URL**: /v1/log/append
 - **Form fields**:
-
-	+`id` - [string] logs collection identifier (for example user ID) , 
- 	+`level` - [string] severity of the log,
- 	+`type` - [string] context data of log record, 
- 	+`log` - [string] body of the log record
+	- `id` - [string] logs collection identifier (for example user ID) , 
+ 	- `level` - [string] severity of the log,
+ 	- `type` - [string] context data of log record, 
+ 	- `log` - [string] body of the log record
 
 ```
 curl --data "id=zipp&level=ERROR&type=LOGIN&log=Login+error+some+beautiful+thursday+morning" http://localhost:8080/v1/log/append
