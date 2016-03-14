@@ -66,6 +66,17 @@ func main() {
 		}
 	})
 
+	router.GET("/v1/report", func(c *gin.Context) {
+		var msg struct {
+			State       string `json:"state"`
+			Description string `json:"description"`
+		}
+		state, desc := dao.ReportState()
+		msg.State = state
+		msg.Description = desc
+		c.JSON(http.StatusOK, msg)
+	})
+
 	address := fmt.Sprintf(":%d", config.RestPort)
 	router.Run(address)
 

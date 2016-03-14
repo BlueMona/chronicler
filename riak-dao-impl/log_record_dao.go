@@ -50,6 +50,14 @@ func (dao *LogRecordRiakDao) DeleteLogRecord(logId string) error {
 	return dao.Cluster.Execute(cmd)
 }
 
+func (dao *LogRecordRiakDao) Ping() (bool, error) {
+	client, error := riak.NewClient(&riak.NewClientOptions{dao.Cluster, 0, nil})
+	if error != nil {
+		return false, error
+	}
+	return client.Ping()
+}
+
 func NewLogRecordRiakDao(cluster *riak.Cluster, logBucket string) *LogRecordRiakDao {
 	return &LogRecordRiakDao{
 		Cluster:   cluster,

@@ -19,7 +19,7 @@ type TimelineRiakDaoImpl struct {
 }
 
 func (dao *TimelineRiakDaoImpl) GetTimeline(id string) (ent.TimelineIndex, error) {
-	index, err := dao.IndexDao.GetLofIndex(id)
+	index, err := dao.IndexDao.GetLogIndex(id)
 	if err != nil {
 		return nil, err
 	}
@@ -41,20 +41,6 @@ func (dao *TimelineRiakDaoImpl) GetTimeline(id string) (ent.TimelineIndex, error
 	}
 	group.Wait()
 	return index, nil
-}
-
-func (dao *TimelineRiakDaoImpl) removeOldEntries(entries ent.TimelineIndex, ch chan bool) {
-	itemsQty := len(entries)
-	group := new(sync.WaitGroup)
-	group.Add(itemsQty)
-	for i := 0; i < itemsQty; i++ {
-		go func(logId string, group *sync.WaitGroup) {
-			dao.LogRecordDao.DeleteLogRecord(logId)
-			group.Done()
-		}(entries[i].Key, group)
-	}
-	group.Wait()
-	ch <- true
 }
 
 func (dao *TimelineRiakDaoImpl) SaveLog(userId string, level string, typeStr string, msg string) error {
@@ -81,6 +67,34 @@ func (dao *TimelineRiakDaoImpl) SaveLog(userId string, level string, typeStr str
 		}
 	}
 	return err
+}
+
+func (dao *TimelineRiakDaoImpl) ReportState() (stateCode, stateDescription string) {
+	stateCode = "ok"
+	stateDescription = ""
+	if result, error := dao.IndexDao.Ping(); error != nil || !result {
+		stateCode = "fail"
+		stateDescription = "Timeline: no ping to Riak instance."
+	}
+	if result, error := dao.LogRecordDao.Ping(); error != nil || !result {
+		stateCode = "fail"
+		stateDescription += " LogRecords: no ping to Riak instance."
+	}
+	return stateCode, stateDescription
+}
+
+func (dao *TimelineRiakDaoImpl) removeOldEntries(entries ent.TimelineIndex, ch chan bool) {
+	itemsQty := len(entries)
+	group := new(sync.WaitGroup)
+	group.Add(itemsQty)
+	for i := 0; i < itemsQty; i++ {
+		go func(logId string, group *sync.WaitGroup) {
+			dao.LogRecordDao.DeleteLogRecord(logId)
+			group.Done()
+		}(entries[i].Key, group)
+	}
+	group.Wait()
+	ch <- true
 }
 
 func NewTimelineRiakDaoImpl(cluster *riak.Cluster, indexBucket string, logBucket string, daysToKeep int) *TimelineRiakDaoImpl {

@@ -64,7 +64,7 @@ func (dao *LogIndexRiakDAO) AppendToLogIndex(userId string, entry ent.IndexEntry
 	return dao.store(userId, value)
 }
 
-func (dao *LogIndexRiakDAO) GetLofIndex(userId string) (ent.TimelineIndex, error) {
+func (dao *LogIndexRiakDAO) GetLogIndex(userId string) (ent.TimelineIndex, error) {
 	index := ent.TimelineIndex{}
 	responce := dao.fetch(userId)
 	if responce == nil || responce.IsNotFound {
@@ -75,6 +75,14 @@ func (dao *LogIndexRiakDAO) GetLofIndex(userId string) (ent.TimelineIndex, error
 	}
 	index = ent.SortEntries(index)
 	return index, nil
+}
+
+func (dao *LogIndexRiakDAO) Ping() (bool, error) {
+	client, error := riak.NewClient(&riak.NewClientOptions{dao.Cluster, 0, nil})
+	if error != nil {
+		return false, error
+	}
+	return client.Ping()
 }
 
 func NewLogIndexRiakDAO(cluster *riak.Cluster, indexBucket string) *LogIndexRiakDAO {
